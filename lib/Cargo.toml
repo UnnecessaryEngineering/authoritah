@@ -1,0 +1,27 @@
+[package]
+name = "authoritah"
+version = "0.1.0"
+authors = ["Sean Bruton <sean@unnecessary.engineering>"]
+edition = "2018"
+publish = false
+description = "Rust-native library for working with Authoritah PKI services"
+homepage = "https://labs.unnecessary.engineering/authoritah"
+repository = "https://github.com/UnnecessaryEngineering/authoritah"
+readme = "README.md"
+keywords = ["pki", "x509", "certificate", "authority", "ca"]
+categories = ["api-bindings", "cryptography", "data-structures", "embedded", "no-std"]
+license = "MIT OR Apache-2.0"
+
+[badges]
+travis-ci = { repository = "UnnecessaryEngineering/authoritah", branch = "master", service = "github" }
+codecov = { repository = "UnnecessaryEngineering/authoritah", branch = "master", service = "github" }
+is-it-maintained-issue-resolution = { repository = "UnnecessaryEngineering/authoritah" }
+is-it-maintained-open-issues = { repository = "UnnecessaryEngineering/authoritah" }
+maintenance = { status = "actively-developed" }
+
+[dependencies]
+log = { version = "0.4.6", optional = true }
+
+[features]
+default = ["std", "log"]
+std = []

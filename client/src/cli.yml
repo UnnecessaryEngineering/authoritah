@@ -1,0 +1,20 @@
+name: authoritah
+version: "0.1.0"
+author: Sean Bruton <sean@unnecessary.engineering>
+about: Authoritah PKI client CLI
+args:
+    - config:
+        short: c
+        long: config
+        value_name: FILE
+        help: Sets a custom config file
+        takes_value: true
+        required: false
+    - verbose:
+        short: v
+        multiple: true
+        help: Sets the level of verbosity
+        required: false
+subcommands:
+    - ca-cert:
+        about: gets the current certificate authority certificate
