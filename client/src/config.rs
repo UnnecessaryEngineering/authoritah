@@ -14,7 +14,11 @@ impl From<clap::ArgMatches<'_>> for Config {
         let logging = LoggingConfig {
             level: resolve_logging_level(matches.occurrences_of("verbose")),
         };
-        Config { ca, command, logging }
+        Config {
+            ca,
+            command,
+            logging,
+        }
     }
 }
 
@@ -28,7 +32,7 @@ impl Default for CAConfig {
     fn default() -> Self {
         Self {
             host: String::from("localhost"),
-            port: 443,
+            port: 8000,
         }
     }
 }

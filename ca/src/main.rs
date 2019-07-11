@@ -10,9 +10,14 @@
 )]
 #![deny(missing_docs, unused_imports, missing_debug_implementations)]
 
+#[macro_use]
+extern crate diesel;
+
 mod api;
 
 mod config;
+
+mod db;
 
 mod error;
 use error::Error;
@@ -23,8 +28,12 @@ type Result<T> = std::result::Result<T, Error>;
 
 fn main() -> Result<()> {
     let config = config::load()?;
+
     logging::initialize(config.logging)?;
-    api::run()?;
+
+    let db = db::connect(config.database)?;
+
+    api::run(db)?;
 
     Ok(())
 }

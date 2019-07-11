@@ -1,5 +1,5 @@
 #[derive(Debug)]
 pub(crate) enum Error {
     LogInitializationError { err: log::SetLoggerError },
-    CAFailure { err: authoritah::error::Error },
+    RequestFailed { err: authoritah::error::Error },
 }

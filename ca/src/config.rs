@@ -1,8 +1,9 @@
-use crate::{Result};
+use crate::Result;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct Config {
     pub(crate) logging: LoggingConfig,
+    pub(crate) database: DatabaseConfig,
 }
 
 impl From<clap::ArgMatches<'_>> for Config {
@@ -10,13 +11,24 @@ impl From<clap::ArgMatches<'_>> for Config {
         let logging = LoggingConfig {
             level: resolve_logging_level(matches.occurrences_of("verbose")),
         };
-        Config { logging }
+        let database = DatabaseConfig {
+            url: matches
+                .value_of("database_url")
+                .unwrap_or("mysql://localhost/authoritah_ca")
+                .into(),
+        };
+        Config { logging, database }
     }
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub(crate) struct LoggingConfig {
     pub(crate) level: Option<crate::logging::Level>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) struct DatabaseConfig {
+    pub(crate) url: String,
 }
 
 pub(crate) fn load() -> Result<Config> {
