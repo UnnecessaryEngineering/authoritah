@@ -1,0 +1,46 @@
+swagger: "2.0"
+info:
+  version: 0.1.0
+  title: Authoritah Certificate Authority
+host: localhost:8000
+basePath: /v0
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /info:
+    get:
+      summary: Information about the certificate authority
+      operationId: info
+      tags:
+        - infomosq
+      responses:
+        "200":
+          description: Information about the certificate authority
+          schema:
+            $ref: "#/definitions/CertificateAuthority"
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  CertificateAuthority:
+    type: "object"
+    required:
+      - commonName
+    properties:
+      commonName:
+        type: string
+  Error:
+    type: "object"
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+      message:
+        type: string

@@ -1,14 +1,30 @@
 //! Certificate Authority
 
+use serde_derive::{Deserialize, Serialize};
+
 use crate::Result;
 
 /// Certificate authority
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct CertificateAuthority;
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CertificateAuthority {
+    common_name: String,
+}
 
 /// Certificate authority information
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct CertificateAuthorityInfo;
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct CertificateAuthorityInfo {
+    /// Certificate authority common name
+    #[serde(rename="commonName")]
+    pub common_name: String,
+}
+
+impl From<&CertificateAuthority> for CertificateAuthorityInfo {
+    fn from(ca: &CertificateAuthority) -> CertificateAuthorityInfo {
+        CertificateAuthorityInfo {
+            common_name: ca.common_name.clone(),
+        }
+    }
+}
 
 impl CertificateAuthority {
     /// Connect to a certificate authority
@@ -16,18 +32,20 @@ impl CertificateAuthority {
     where
         S: Into<String>,
     {
-        Ok(CertificateAuthority {})
+        Ok(CertificateAuthority {
+            common_name: "Testing".into(),
+        })
     }
 
     /// Gets basic information regarding the certificate authority
     pub fn info(&self) -> Result<CertificateAuthorityInfo> {
-        Ok(CertificateAuthorityInfo {})
+        Ok(self.into())
     }
 }
 
 #[cfg(feature = "std")]
 impl std::fmt::Display for CertificateAuthorityInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "common_name : {}", "CUNT!")
+        write!(f, "common_name : {}", self.common_name)
     }
 }
