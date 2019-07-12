@@ -1,0 +1,26 @@
+[config]
+skip_core_tasks = true
+init_task = "init"
+
+[tasks.init]
+
+[tasks.docker-ca]
+workspace = false
+script_runner = "@shell"
+script = [
+'''
+docker build -t unnecessary/authoritah-ca -f ca/Dockerfile .
+'''
+]
+
+[tasks.docker]
+workspace = false
+dependencies = [
+    "docker-ca",
+]
+
+[tasks.default]
+workspace = false
+dependencies = [
+    "docker",
+]
