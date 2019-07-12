@@ -13,5 +13,7 @@ pub(crate) type Pool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
 
 pub(crate) fn connect(config: DatabaseConfig) -> Result<Pool> {
     let manager = ConnectionManager::<MysqlConnection>::new(config.url);
-    r2d2::Pool::builder().build(manager).map_err(|err| Error::DatabaseConnectionFailed { err })
+    r2d2::Pool::builder()
+        .build(manager)
+        .map_err(|err| Error::DatabaseConnectionFailed { err })
 }

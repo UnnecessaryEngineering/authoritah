@@ -29,7 +29,7 @@ enum Command {
 
 fn main() -> Result<()> {
     let config = config::load()?;
-    
+
     logging::initialize(config.logging)?;
 
     match config.command {
