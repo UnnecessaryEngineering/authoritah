@@ -38,11 +38,56 @@ fn info(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = Actix
         })
 }
 
+fn init(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = ActixError> {
+    use crate::db::model::CertificateAuthority;
+    use crate::db::schema::certificate_authority::dsl::*;
+    debug!("received authority initialization request");
+    web::block(move || pool.get()).then(|connection_result| match connection_result {
+        Ok(connection) => {
+            match certificate_authority.load::<CertificateAuthority>(&connection) {
+                Ok(ca) => {
+                    if ca.len() > 0 {
+                        warn!("attempt to initialize certificate authority rejected: authority already initialized");
+                        Ok(HttpResponse::Conflict().json(CertificateAuthorityError {
+                            code: 3,
+                            message: "certificate authority already initialized".into(),
+                        }))
+                    } else {
+                        let info: CertificateAuthorityInfo = CertificateAuthorityInfo {
+                            common_name: "TESTING".into(),
+                        };
+                        Ok(HttpResponse::Ok().json(info))
+                    }
+                }
+                Err(err) => {
+                    error!("failed to query database: {}", err);
+                    Ok(
+                    HttpResponse::InternalServerError().json(CertificateAuthorityError {
+                        code: 1,
+                        message: "internal server error".into(),
+                    }),
+                )
+                }
+            }
+        }
+        Err(err) => {
+            error!("failed to obtain database connection from pool: {}", err);
+            Ok(
+                    HttpResponse::InternalServerError().json(CertificateAuthorityError {
+                        code: 1,
+                        message: "internal server error".into(),
+                    }),
+                )
+        }
+    })
+}
+
 pub(super) fn run(db: Pool) -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(db.clone())
             .route("/v0/info", web::get().to_async(info))
+            .route("/v0/init", web::post().to_async(init))
     })
     .bind("0.0.0.0:8000")
     .expect("Can not bind to port 8000")
