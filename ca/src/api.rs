@@ -42,7 +42,7 @@ pub(super) fn run(db: Pool) -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(db.clone())
-            .route("/info", web::get().to_async(info))
+            .route("/v0/info", web::get().to_async(info))
     })
     .bind("0.0.0.0:8000")
     .expect("Can not bind to port 8000")
