@@ -16,12 +16,38 @@ paths:
       summary: Information about the certificate authority
       operationId: info
       tags:
-        - infomosq
+        - information
       responses:
         "200":
           description: Information about the certificate authority
           schema:
             $ref: "#/definitions/CertificateAuthority"
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+  /init:
+    post:
+      summary: Initializes a new certificate authority
+      operationId: init
+      tags:
+        - configuration
+      requestBody:
+        description: Certificate authority profile
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/CertificateAuthority'
+      responses:
+        "200":
+          description: Certificate authority successfully initialized
+          schema:
+            $ref: "#/definitions/CertificateAuthority"
+        "409":
+          description: Certificate authority already initialized
+          schema:
+            $ref: "#/definitions/Error"
         default:
           description: unexpected error
           schema:

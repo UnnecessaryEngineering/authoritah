@@ -49,10 +49,13 @@ fn info(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = Actix
     })
 }
 
-fn init(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = ActixError> {
+fn init(
+    profile: web::Json<CertificateAuthorityInfo>,
+    pool: web::Data<Pool>,
+) -> impl Future<Item = HttpResponse, Error = ActixError> {
     use crate::db::model::CertificateAuthority;
     use crate::db::schema::certificate_authority::dsl::*;
-    debug!("received authority initialization request");
+    debug!("received authority initialization request: {:#?}", &profile);
     web::block(move || pool.get()).then(|connection_result| match connection_result {
         Ok(connection) => {
             match certificate_authority.load::<CertificateAuthority>(&connection) {
