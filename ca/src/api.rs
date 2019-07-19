@@ -10,32 +10,43 @@ fn info(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = Actix
     use crate::db::model::CertificateAuthority;
     use crate::db::schema::certificate_authority::dsl::*;
     debug!("received authority information request");
-    // TODO don't unwrap blindly here, you fool!
-    web::block(move || certificate_authority.load::<CertificateAuthority>(&pool.get().unwrap()))
-        .then(|result| match result {
-            Ok(ca) => {
-                if ca.len() < 1 {
-                    warn!("information request failed due to no certificate authority configuration in database");
-                    Ok(HttpResponse::ServiceUnavailable().json(CertificateAuthorityError {
-                        code: 2,
-                        message: "certificate authority not configured".into(),
-                    }))
-                } else {
-                    let info: CertificateAuthorityInfo = (&ca[0]).into();
-                    debug!("information request successful: {:?}", &info);
-                    Ok(HttpResponse::Ok().json(info))
+    web::block(move || pool.get()).then(|connection_result| match connection_result {
+        Ok(connection) => {
+            match certificate_authority.load::<CertificateAuthority>(&connection) {
+                Ok(ca) => {
+                    if ca.len() < 1 {
+                        warn!("information request failed due to no certificate authority configuration in database");
+                        Ok(HttpResponse::ServiceUnavailable().json(CertificateAuthorityError {
+                            code: 2,
+                            message: "certificate authority not configured".into(),
+                        }))
+                    } else {
+                        let info: CertificateAuthorityInfo = (&ca[0]).into();
+                        debug!("information request successful: {:?}", &info);
+                        Ok(HttpResponse::Ok().json(info))
+                    }
+                }
+                Err(err) => {
+                    error!("failed to query database: {}", err);
+                    Ok(
+                        HttpResponse::InternalServerError().json(CertificateAuthorityError {
+                            code: 1,
+                            message: "internal server error".into(),
+                        }),
+                    )
                 }
             }
-            Err(err) => {
-                error!("failed to query database: {}", err);
-                Ok(
+        }
+        Err(err) => {
+            error!("failed to obtain database connection from pool: {}", err);
+            Ok(
                     HttpResponse::InternalServerError().json(CertificateAuthorityError {
                         code: 1,
                         message: "internal server error".into(),
                     }),
                 )
-            }
-        })
+        }
+    })
 }
 
 fn init(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = ActixError> {
