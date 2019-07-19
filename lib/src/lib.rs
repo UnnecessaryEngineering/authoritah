@@ -23,11 +23,3 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub mod prelude {
     pub use crate::ca::CertificateAuthority;
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
