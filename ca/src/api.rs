@@ -6,11 +6,26 @@ use log::*;
 
 use crate::{db::Pool, error::Error, Result};
 
+fn get_database_connection(pool: web::Data<Pool>) -> impl Future<Item = r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::MysqlConnection>>, Error = HttpResponse> {
+    web::block(move || pool.get()).then(|connection_result| match connection_result {
+        Ok(connection) => Ok(connection),
+        Err(err) => {
+            error!("failed to obtain database connection from pool: {}", err);
+            Err(
+                    HttpResponse::InternalServerError().json(CertificateAuthorityError {
+                        code: 1,
+                        message: "internal server error".into(),
+                    }),
+                )
+        }
+    })
+}
+
 fn info(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = ActixError> {
     use crate::db::model::CertificateAuthority;
     use crate::db::schema::certificate_authority::dsl::*;
-    debug!("received authority information request");
-    web::block(move || pool.get()).then(|connection_result| match connection_result {
+    debug!("received certificate authority information request");
+    get_database_connection(pool).then(|result| match result {
         Ok(connection) => {
             match certificate_authority.load::<CertificateAuthority>(&connection) {
                 Ok(ca) => {
@@ -37,15 +52,7 @@ fn info(pool: web::Data<Pool>) -> impl Future<Item = HttpResponse, Error = Actix
                 }
             }
         }
-        Err(err) => {
-            error!("failed to obtain database connection from pool: {}", err);
-            Ok(
-                    HttpResponse::InternalServerError().json(CertificateAuthorityError {
-                        code: 1,
-                        message: "internal server error".into(),
-                    }),
-                )
-        }
+        Err(response) => Ok(response)
     })
 }
 
@@ -56,7 +63,7 @@ fn init(
     use crate::db::model::CertificateAuthority;
     use crate::db::schema::certificate_authority::dsl::*;
     debug!("received authority initialization request: {:#?}", &profile);
-    web::block(move || pool.get()).then(|connection_result| match connection_result {
+    get_database_connection(pool).then(|result| match result {
         Ok(connection) => {
             match certificate_authority.load::<CertificateAuthority>(&connection) {
                 Ok(ca) => {
@@ -84,15 +91,7 @@ fn init(
                 }
             }
         }
-        Err(err) => {
-            error!("failed to obtain database connection from pool: {}", err);
-            Ok(
-                    HttpResponse::InternalServerError().json(CertificateAuthorityError {
-                        code: 1,
-                        message: "internal server error".into(),
-                    }),
-                )
-        }
+        Err(response) => Ok(response)
     })
 }
 
