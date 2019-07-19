@@ -26,9 +26,10 @@ pub struct CertificateAuthorityInfo {
 impl TryFrom<&CertificateAuthority> for CertificateAuthorityInfo {
     type Error = Error;
     fn try_from(ca: &CertificateAuthority) -> std::result::Result<Self, Self::Error> {
+        println!("{:#?}", ca);
         let endpoint = ca
             .endpoint
-            .join("/info")
+            .join("./info")
             .map_err(|err| Error::BadConnectionInfo { err })?;
         let mut result =
             reqwest::get(endpoint).map_err(|err| Error::CommunicationFailure { err })?;
@@ -55,7 +56,7 @@ impl CertificateAuthority {
     where
         S: Into<String>,
     {
-        let url = format!("http://{}:{}/v0", host.into(), port);
+        let url = format!("http://{}:{}/v0/", host.into(), port);
         Ok(CertificateAuthority {
             endpoint: Url::parse(&url).map_err(|err| Error::BadConnectionInfo { err })?,
         })
