@@ -21,10 +21,11 @@ mod logging;
 
 type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 enum Command {
     CACert,
     CAInfo,
+    CAInit { common_name: String },
 }
 
 fn main() -> Result<()> {
@@ -32,9 +33,10 @@ fn main() -> Result<()> {
 
     logging::initialize(config.logging)?;
 
-    match config.command {
-        Command::CACert => commands::ca_cert::exec(config)?,
-        Command::CAInfo => commands::ca_info::exec(config)?,
+    match &config.command {
+        Command::CACert => commands::ca_cert::exec(&config)?,
+        Command::CAInfo => commands::ca_info::exec(&config)?,
+        Command::CAInit { common_name } => commands::ca_init::exec(&config, common_name)?,
     };
 
     Ok(())

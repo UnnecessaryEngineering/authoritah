@@ -26,7 +26,6 @@ pub struct CertificateAuthorityInfo {
 impl TryFrom<&CertificateAuthority> for CertificateAuthorityInfo {
     type Error = Error;
     fn try_from(ca: &CertificateAuthority) -> std::result::Result<Self, Self::Error> {
-        println!("{:#?}", ca);
         let endpoint = ca
             .endpoint
             .join("./info")
@@ -65,6 +64,11 @@ impl CertificateAuthority {
     /// Gets basic information regarding the certificate authority
     pub fn info(&self) -> Result<CertificateAuthorityInfo> {
         self.try_into()
+    }
+
+    /// Initializes a new certificate authority
+    pub fn init(&self, info: CertificateAuthorityInfo) -> Result<CertificateAuthorityInfo> {
+        Ok(info)
     }
 }
 

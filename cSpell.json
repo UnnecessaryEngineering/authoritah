@@ -3,6 +3,8 @@
     "language": "en-US",
     "words": [
         "actix",
-        "authoritah"
+        "authoritah",
+        "cli",
+        "subcommand"
     ]
 }

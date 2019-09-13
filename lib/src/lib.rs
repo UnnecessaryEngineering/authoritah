@@ -22,4 +22,5 @@ pub type Result<T> = core::result::Result<T, Error>;
 /// Convenience module for accessing standard public interfaces (`use authoritah::prelude::*`)
 pub mod prelude {
     pub use crate::ca::CertificateAuthority;
+    pub use crate::ca::CertificateAuthorityInfo;
 }
