@@ -1,4 +1,0 @@
-CREATE TABLE certificate_authority (
-    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    common_name VARCHAR(255) NOT NULL
-)

@@ -4,7 +4,13 @@
     "words": [
         "actix",
         "authoritah",
+        "chrono",
         "cli",
+        "cryptonomicon",
+        "dyn",
+        "fmt",
+        "keypair",
+        "PKCS",
         "subcommand"
     ]
 }

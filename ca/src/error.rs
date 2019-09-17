@@ -1,6 +1,10 @@
 #[derive(Debug)]
-pub(crate) enum Error {
-    LogInitializationError { err: log::SetLoggerError },
-    ApiError { err: std::io::Error },
-    DatabaseConnectionFailed { err: r2d2::Error },
+pub enum Error {
+    EllipticCurveFailure { cause: cryptonomicon::elliptic::Error },
+}
+
+impl From<cryptonomicon::elliptic::Error> for Error {
+    fn from(cause: cryptonomicon::elliptic::Error) -> Self {
+        Self::EllipticCurveFailure { cause }
+    }
 }

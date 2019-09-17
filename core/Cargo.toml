@@ -1,5 +1,5 @@
 [package]
-name = "authoritah-cli"
+name = "authoritah"
 version = "0.1.0"
 authors = ["Sean Bruton <sean@unnecessary.engineering>"]
 edition = "2018"

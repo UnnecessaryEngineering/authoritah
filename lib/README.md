@@ -1,1 +1,0 @@
-# Authoritah Client Library
